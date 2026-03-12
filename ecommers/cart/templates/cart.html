@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+        <!-- Header-->
+        <header class="bg-dark py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="text-center text-white">
+                    <img src="{% static 'assets/changoskateico.png' %}" alt="Chango Skate" width="200wv"  class="d-inline-block align-text-top">
+                    <h1 class="display-4 fw-bolder">Carrito de compras</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">Checa los productos que tienes en tu carrito</p>
+                </div>
+            </div>
+        </header>
+        <br>
+        <div class="container">
+        {% if cart %}
+        {% for product in cart.get_products %}                  
+        <div class="card mb-3" style="max-width: 540px;">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="{{ product.name }}">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text" style="text-align: justify;"> {{ product.description }}</p>
+
+                        {%if product.is_saler %}
+                            <p class="card-text"> <small class="text-body-secondary"> <strike> ${{ product.price}} </strike> </small> </p>
+                            <p class="card-text"><small class="text-body-secondary">${{ product.sale_price|floatformat:2 }}</small></p>
+                        {% else %}
+                            <p class="card-text"><small class="text-body-secondary">${{ product.price|floatformat:2 }}</small></p>
+                        {% endif %}
+                        <div class="row justify-content-start align-items-center">
+                            <div class="col-md-5">Cantidad:</div>
+                            <div class="col-md-3">
+                                <select class="form-select form-select-sm" id="qty-cart">
+                                    <option selected> 
+                                        {%for key, value in quantities.items %} 
+                                            {% if key == product.id|slugify %}
+                                                {{ value }}
+                                            {% endif %}
+                                        {%endfor%}
+                                    </option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Inicio</a>
+                    </div>
+                </div>
+            </div>
+        </div>      
+        {% endfor %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                Tu carrito está vacío. <a href="{% url 'home' %}" class="alert-link">Continuar comprando</a>
+            </div>
+        {% endif %}
+        </div>
+{% endblock %}
