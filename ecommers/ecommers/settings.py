@@ -16,6 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'changoskate.onrender.com',
     '.onrender.com',
+    '127.0.0.1'
 ]
 
 

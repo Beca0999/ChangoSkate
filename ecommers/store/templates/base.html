@@ -14,6 +14,7 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
         <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script> 
+        <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
     </head>
     <body>
         <!-- Navigation-->
@@ -37,5 +38,38 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="{% static 'js/scripts.js' %}"></script>
+
+        
+        <script type="module">
+            import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+            // Tu usuario y contraseña convertidos para la cabecera de seguridad
+            const b64auth = btoa('ikalnaran:C0smopolis');
+
+            createChat({
+                webhookUrl: 'https://n8n-n8n-production-f580.up.railway.app/webhook/c0757cd4-50ff-4efc-b947-7468720a7f3c/chat',
+                webhookConfig: {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Basic ${b64auth}`
+                    }
+                },
+                mode: 'window', // Cambiado a ventana para que flote en tu ecommerce
+                showWelcomeScreen: true,
+                chatButton: {
+                    active: true,
+                    backgroundColor: '#000000',
+                },
+                title: 'ChangoBot',
+                subtitle: 'Estamos en línea. ¿En qué podemos ayudarte?',
+                i18n: {
+                    en: {
+                        title: 'ChangoBot',
+                        sendButtonText: 'Enviar',
+                        inputPlaceholder: 'Escribe tu mensaje...',
+                    }
+                }
+            });
+        </script>
     </body>
 </html>
