@@ -13,7 +13,10 @@ SECRET_KEY = 'django-insecure-kk!+zkbz_*wyhgr#io$*-dyin9@g6vyt3$63d-uds=qf8ey3s4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'changoskate.onrender.com',
+    '.onrender.com',
+]
 
 
 # Application definition
