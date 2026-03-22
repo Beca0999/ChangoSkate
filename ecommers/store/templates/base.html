@@ -1,75 +1,152 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es-MX">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="Pagina de muestra sobre comercio electrónico con integración de Bootstrap" />
-        <meta name="author" content="Iván Mauricio" />
-        <title>ChangoSkate</title>
-        <!-- Favicon-->
-        <link rel="icon" type="image/x-icon" href=" {% static 'assets/favicon.ico' %}" />
-        <!-- Bootstrap icons-->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
-        <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script> 
-        <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
-    </head>
-    <body>
-        <!-- Navigation-->
-        {% include 'navbar.html' %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-        {% block content %}
-        
-        {% endblock %}
-        <!-- Footer-->
-        <footer class="py-5 bg-dark">
-            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; ChangoSkate 2025</p></div>
-        </footer>
-        <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Core theme JS-->
-        <script src="{% static 'js/scripts.js' %}"></script>
 
-        
-        <script type="module">
-            import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>ChangoSkate</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+    <style>
+        /* Clase para texto que solo lee la voz, invisible al ojo */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
 
-            // Tu usuario y contraseña convertidos para la cabecera de seguridad
-            const b64auth = btoa('ikalnaran:C0smopolis');
+        body.large-text {
+            font-size: 1.25rem !important;
+        }
 
-            createChat({
-                webhookUrl: 'https://n8n-n8n-production-f580.up.railway.app/webhook/c0757cd4-50ff-4efc-b947-7468720a7f3c/chat',
-                webhookConfig: {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Basic ${b64auth}`
-                    }
-                },
-                mode: 'window', // Cambiado a ventana para que flote en tu ecommerce
-                showWelcomeScreen: true,
-                chatButton: {
-                    active: true,
-                    backgroundColor: '#000000',
-                },
-                title: 'ChangoBot',
-                subtitle: 'Estamos en línea. ¿En qué podemos ayudarte?',
-                i18n: {
-                    en: {
-                        title: 'ChangoBot',
-                        sendButtonText: 'Enviar',
-                        inputPlaceholder: 'Escribe tu mensaje...',
-                    }
-                }
-            });
-        </script>
-    </body>
+        #voice-btn-float {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        #main-voice-btn {
+            width: 55px;
+            height: 55px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        /* Efecto hover suave para el botón */
+        #main-voice-btn:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="voice-btn-float">
+        <button id="main-voice-btn" class="btn btn-danger rounded-circle shadow-lg p-3" onclick="toggleScreenReader()"
+            title="Guía de Voz">
+            <i class="bi bi-soundwave fs-4"></i>
+        </button>
+    </div>
+
+    {% include 'navbar.html' %}
+    {% block content %}{% endblock %}
+
+    <footer class="py-5 bg-dark">
+        <div class="container">
+            <p class="m-0 text-center text-white">Copyright &copy; ChangoSkate 2025</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            if (localStorage.getItem('voiceActive') === 'true') activateScreenReader(false);
+        });
+
+        let screenReaderActive = false;
+        const synth = window.speechSynthesis;
+        let lastRead = "";
+
+        window.speak = function (text) {
+            if (!text || !screenReaderActive) return;
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text.replace(/Skate/gi, "Skeit"));
+            const voices = synth.getVoices();
+            // Prioridad a voces de Google o Naturales
+            const bestVoice = voices.find(v => v.lang.includes('es-MX') && v.name.includes('Google')) || voices.find(v => v.lang.includes('es-MX'));
+            if (bestVoice) utterance.voice = bestVoice;
+            utterance.lang = 'es-MX';
+            utterance.rate = 0.95;
+            synth.speak(utterance);
+        }
+
+        function activateScreenReader(announce = true) {
+            screenReaderActive = true;
+            localStorage.setItem('voiceActive', 'true');
+            document.getElementById('main-voice-btn').classList.replace('btn-danger', 'btn-success');
+            if (announce) speak("Guía de voz activa.");
+        }
+
+        function deactivateScreenReader() {
+            screenReaderActive = false;
+            localStorage.setItem('voiceActive', 'false');
+            document.getElementById('main-voice-btn').classList.replace('btn-success', 'btn-danger');
+            synth.cancel();
+        }
+
+        function toggleScreenReader() { screenReaderActive ? deactivateScreenReader() : activateScreenReader(); }
+
+        document.addEventListener('mouseover', (e) => {
+            if (!screenReaderActive) return;
+            let target = e.target;
+            let text = "";
+
+            // Prioridad 1: Nuestra etiqueta invisible con el precio limpio (voice-data)
+            let card = target.closest('.card');
+            if (card) {
+                text = card.querySelector('.voice-data')?.innerText;
+            }
+            // Prioridad 2: Carrito
+            else if (target.closest('#cart-btn')) {
+                const qty = document.getElementById('cart-quantity')?.innerText.trim() || "0";
+                text = (qty === "0") ? "Tu carrito está vacío." : "Tienes " + qty + " elementos en el carrito.";
+            }
+            // Prioridad 3: Botones y enlaces
+            else if (['H1', 'H2', 'H3', 'H5', 'P', 'A', 'BUTTON', 'LI'].includes(target.tagName)) {
+                if (target.innerText.trim().length > 1) text = target.innerText;
+            }
+
+            if (text && text !== lastRead) {
+                speak(text);
+                lastRead = text;
+            }
+        });
+
+        document.addEventListener('mouseout', () => { lastRead = ""; });
+        window.speechSynthesis.onvoiceschanged = () => synth.getVoices();
+    </script>
+
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+        const b64auth = btoa('ikalnaran:C0smopolis');
+        createChat({
+            webhookUrl: 'https://n8n-n8n-production-f580.up.railway.app/webhook/c0757cd4-50ff-4efc-b947-7468720a7f3c/chat',
+            webhookConfig: { method: 'POST', headers: { 'Authorization': `Basic ${b64auth}` } },
+            mode: 'window',
+            chatButton: { active: true, backgroundColor: '#000000' },
+            title: 'ChangoBot'
+        });
+    </script>
+</body>
+
 </html>
