@@ -137,7 +137,9 @@ ChangoSkate/
 
 ## 👥 Autores
 
-* Equipo ChangoSkate
+Gómez González Rebeca
+Valverde Palacios Raúl Miguel
+Vazquez Trejo Iván Mauricio
 
 ---
 
