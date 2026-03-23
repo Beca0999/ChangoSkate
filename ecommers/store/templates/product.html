@@ -1,74 +1,53 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
-    <div class="card mb-3" style="max-width: 540px;">
-        <div class="row g-0">
-            <div class="col-md-4">
-                <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="...">
+
+<div class="container py-5">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 900px;">
+        <div class="row g-0 align-items-center">
+            <div class="col-md-6 p-4 text-center">
+                <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}"
+                    style="max-height: 500px; width: auto;">
             </div>
-            <div class="col-md-8">
+
+            <div class="col-md-6 p-5">
                 <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text" style="text-align: justify;"> {{ product.description }}</p>
+                    <h2 class="display-5 fw-bold">{{ product.name }}</h2>
+                    <p class="text-muted fs-5">Tabla de madera</p>
 
-                    {%if product.is_saler %}
-                    <p class="card-text">
-                        <small class="text-body-secondary">
-                            <strike>
-                                ${{ product.price}}
-                            </strike>
-                        </small>
-                    </p>
-                    <p class="card-text"><small class="text-body-secondary">${{ product.sale_price|floatformat:2
-                            }}</small></p>
-                    {% else %}
-                    <p class="card-text"><small class="text-body-secondary">${{ product.price|floatformat:2 }}</small>
-                    </p>
-                    {% endif %}
-
-                    <div class="row justify-content-start align-items-center">
-                        <div class="col-md-5">Cantidad:</div>
-                        <div class="col-md-3">
-                            <select class="form-select form-select-sm" id="qty-cart">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
+                    <div class="mb-4">
+                        {% if product.is_saler %}
+                        <strike class="text-muted fs-5">${{ product.price|floatformat:2 }}</strike><br>
+                        <span class="text-danger display-6 fw-bold">${{ product.sale_price|floatformat:2 }}</span>
+                        {% else %}
+                        <span class="display-6 fw-bold">${{ product.price|floatformat:2 }}</span>
+                        {% endif %}
                     </div>
 
-                    <a href="{% url 'home' %}" class="btn btn-secondary">Inicio</a>
+                    <span class="visually-hidden voice-data">
+                        Producto: {{ product.name }}.
+                        Costo: {% if product.is_saler %}{{ product.sale_price|floatformat:0 }}{% else %}{{
+                        product.price|floatformat:0 }}{% endif %} pesos.
+                    </span>
 
-                    <button type="button" value="{{ product.id }}" class="btn btn-secondary" id="add_cart">Agregar al
-                        Carrito</button>
+                    <div class="d-flex align-items-center mb-4">
+                        <label for="qty-cart" class="me-3 fs-5">Cantidad:</label>
+                        <select class="form-select w-25" id="qty-cart">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex">
+                        <a href="{% url 'home' %}" class="btn btn-secondary btn-lg px-4">Inicio</a>
+                        <button type="button" class="btn btn-dark btn-lg px-4" id="add-cart">Agregar al Carrito</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    // Verifica si el boton a sido clickeado    
-    $(document).on('click', '#add_cart', function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: "POST",
-            url: "{% url 'cart_add' %}",
-            data: {
-                'product_id': $('#add_cart').val(),
-                'csrfmiddlewaretoken': '{{ csrf_token }}',
-                'product_qty': $('#qty-cart option:selected').text()
-            },
-            success: function (response) {
-                document.getElementById('cart-quantity').textContent = response.qty;
-                console.log(response.message);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error:', error);
-            }
-        });
-    });
-</script>
 {% endblock %}

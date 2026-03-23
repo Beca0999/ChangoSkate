@@ -4,8 +4,7 @@
 
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-5 text-center text-white">
-        <img src="{% static 'assets/changoskateico.png' %}" alt="Chango Skate" width="200wv"
-            class="d-inline-block align-text-top">
+        <img src="{% static 'assets/changoskateico.png' %}" alt="Logo" width="200">
         <h1 class="display-4 fw-bolder">ChangoSkate</h1>
         <p class="lead fw-normal text-white-50 mb-0">Convierte tu pasión por el skate en una experiencia única</p>
     </div>
@@ -13,36 +12,45 @@
 
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-3 row-cols-xl-4 justify-content-center">
+
             {% for product in products %}
             <div class="col mb-5">
-                <div class="card h-100">
-                    {% if product.is_saler %}<div class="badge bg-dark text-white position-absolute"
-                        style="top: 0.5rem; right: 0.5rem">Sale</div>{% endif %}
-                    <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}" />
+                <div class="card h-100 shadow-sm">
+                    {% if product.is_saler %}
+                    <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale
+                    </div>
+                    {% endif %}
+
+                    <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}"
+                        style="height: 250px; object-fit: contain; padding: 15px;">
 
                     <div class="card-body p-4 text-center">
+                        <h5 class="fw-bolder">{{ product.name }}</h5>
+
+                        <div class="product-price mb-3">
+                            {% if product.is_saler %}
+                            <strike class="text-muted">${{ product.price|floatformat:2 }}</strike>
+                            <span class="text-danger fw-bold">${{ product.sale_price|floatformat:2 }}</span>
+                            {% else %}
+                            <span>${{ product.price|floatformat:2 }}</span>
+                            {% endif %}
+                        </div>
+
                         <span class="visually-hidden voice-data">
                             Producto: {{ product.name }}.
-                            Costo: {% if product.is_saler %}{{ product.sale_price|floatformat:0 }} pesos con {{
-                            product.sale_price|stringformat:".2f"|slice:"-2:" }} centavos{% else %}{{
-                            product.price|floatformat:0 }} pesos{% endif %}.
+                            Precio: {% if product.is_saler %}{{ product.sale_price|floatformat:0 }}{% else %}{{
+                            product.price|floatformat:0 }}{% endif %} pesos.
                         </span>
-
-                        <h5 class="fw-bolder">{{ product.name }}</h5>
-                        {% if product.is_saler %}
-                        <strike class="text-muted">${{ product.price|floatformat:2 }}</strike>
-                        <span class="text-danger fw-bold">${{ product.sale_price|floatformat:2 }}</span>
-                        {% else %}
-                        ${{ product.price|floatformat:2 }}
-                        {% endif %}
                     </div>
+
                     <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
                         <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">Ver producto</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
+
         </div>
     </div>
 </section>
