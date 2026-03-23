@@ -1,56 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-5 text-center text-white">
         <img src="{% static 'assets/changoskateico.png' %}" alt="Logo" width="200">
         <h1 class="display-4 fw-bolder">ChangoSkate</h1>
-        <p class="lead fw-normal text-white-50 mb-0">Convierte tu pasión por el skate en una experiencia única</p>
     </div>
 </header>
 
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
         <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-3 row-cols-xl-4 justify-content-center">
-
             {% for product in products %}
             <div class="col mb-5">
-                <div class="card h-100 shadow-sm">
+                <div class="card h-100 shadow-sm" style="min-height: 480px;">
                     {% if product.is_saler %}
-                    <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale
-                    </div>
+                        <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
                     {% endif %}
-
-                    <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}"
-                        style="height: 250px; object-fit: contain; padding: 15px;">
-
+                    <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}" style="height: 200px; object-fit: contain; padding: 10px;">
                     <div class="card-body p-4 text-center">
                         <h5 class="fw-bolder">{{ product.name }}</h5>
-
-                        <div class="product-price mb-3">
+                        <div class="mb-3">
                             {% if product.is_saler %}
-                            <strike class="text-muted">${{ product.price|floatformat:2 }}</strike>
-                            <span class="text-danger fw-bold">${{ product.sale_price|floatformat:2 }}</span>
+                                <strike class="text-muted small">${{ product.price|stringformat:".2f" }}</strike> 
+                                <span class="text-danger fw-bold d-block">${{ product.sale_price|stringformat:".2f" }}</span>
                             {% else %}
-                            <span>${{ product.price|floatformat:2 }}</span>
+                                <span class="fw-bold">${{ product.price|stringformat:".2f" }}</span>
                             {% endif %}
                         </div>
-
-                        <span class="visually-hidden voice-data">
-                            Producto: {{ product.name }}.
-                            Precio: {% if product.is_saler %}{{ product.sale_price|floatformat:0 }}{% else %}{{
-                            product.price|floatformat:0 }}{% endif %} pesos.
-                        </span>
+                        <span class="visually-hidden voice-data">Producto {{ product.name }}, precio {% if product.is_saler %}{{ product.sale_price|floatformat:0 }}{% else %}{{ product.price|floatformat:0 }}{% endif %} pesos</span>
                     </div>
-
                     <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
                         <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">Ver producto</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
-
         </div>
     </div>
 </section>
